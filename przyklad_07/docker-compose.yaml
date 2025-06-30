@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/data
+      - sages:/sages
+      - inny:/inny
+    environment:
+      - ENV_VARIABLE=test
+
+volumes:
+  sages:
+    external: true
+  inny:
+    name: drugi_volume

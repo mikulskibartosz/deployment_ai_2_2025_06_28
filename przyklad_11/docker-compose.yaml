@@ -1,0 +1,10 @@
+services:
+  service_a:
+    build: ./service_a
+
+  service_b:
+    build: ./service_b
+    depends_on:
+      - service_a
+    ports:
+      - "8000:8000"

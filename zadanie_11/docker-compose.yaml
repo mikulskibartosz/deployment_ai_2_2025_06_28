@@ -1,0 +1,32 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    configs:
+      - source: zawartosc_pliku
+        target: /config/config.xml
+      - source: tekst
+        target: /config/tekst.txt
+      - source: zmienna
+        target: /config/zmienna
+    secrets:
+      - nazwa_pliku
+    volumes:
+      - ./katalog:/katalog
+
+configs:
+  zawartosc_pliku:
+    file: config.xml
+
+  tekst:
+    content: |
+      To jest tekst.
+      Ma dwa zdania.
+
+  zmienna:
+    environment: ZMIENNA
+
+secrets:
+  nazwa_pliku:
+    environment: NAZWA_PLIKU

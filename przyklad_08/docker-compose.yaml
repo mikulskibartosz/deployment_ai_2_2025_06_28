@@ -1,0 +1,35 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    configs:
+      - source: zawartosc_pliku
+        target: /config/config.xml
+      - source: tekst
+        target: /config/tekst.txt
+      - source: zmienna
+        target: /config/zmienna
+    secrets:
+      - certyfikat
+      - source: klucz_do_api
+        target: token
+
+configs:
+  zawartosc_pliku:
+    file: config.xml
+
+  tekst:
+    content: |
+      To jest tekst.
+      Ma dwa zdania.
+
+  zmienna:
+    environment: ZMIENNA
+
+secrets:
+  certyfikat:
+    file: requirements.txt
+
+  klucz_do_api:
+    environment: KLUCZ_DO_API

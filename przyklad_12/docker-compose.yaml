@@ -1,0 +1,36 @@
+services:
+  backend:
+    build: ./backend
+    depends_on:
+      - redis
+    networks:
+      - backend_redis_network
+      - frontend_backend_network
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "8000:8000"
+    networks:
+      - frontend_backend_network
+
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - backend_redis_network
+
+volumes:
+  redis_data:
+
+networks:
+  backend_redis_network:
+    driver: bridge
+    internal: true
+  frontend_backend_network:
+    driver: bridge

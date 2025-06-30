@@ -1,0 +1,10 @@
+services:
+  service_a:
+    build: ./service_a
+    network_mode: host
+
+  service_b:
+    build: ./service_b
+    depends_on:
+      - service_a
+    network_mode: host

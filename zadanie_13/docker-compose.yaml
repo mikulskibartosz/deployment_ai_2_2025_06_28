@@ -1,0 +1,95 @@
+services:
+  redis-b:
+    image: redis:latest
+    volumes:
+      - redis-b-data:/data
+    networks:
+      - b-db-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  redis-c:
+    image: redis:latest
+    volumes:
+      - redis-c-data:/data
+    networks:
+      - c-db-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  service-a:
+    build: ./service-a
+    ports:
+      - "8000:8000"
+    networks:
+      - public-network
+      - ab-network
+      - ac-network
+    depends_on:
+      - service-b
+      - service-c
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  service-b:
+    build: ./service-b
+    configs:
+      - source: redis_b_url
+        target: /run/configs/redis_url
+    networks:
+      - b-db-network
+      - ab-network
+    depends_on:
+      - redis-b
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  service-c:
+    build: ./service-c
+    secrets:
+      - redis_c_url
+    networks:
+      - c-db-network
+      - ac-network
+    depends_on:
+      - redis-c
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  public-network:
+  ab-network:
+    internal: true
+  ac-network:
+    internal: true
+  b-db-network:
+    internal: true
+  c-db-network:
+    internal: true
+
+volumes:
+  redis-b-data:
+  redis-c-data:
+
+secrets:
+  redis_c_url:
+    file: ./redis_c_url.txt
+
+configs:
+  redis_b_url:
+    file: ./redis_b_url.txt
